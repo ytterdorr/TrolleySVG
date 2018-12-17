@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js"></script>
+    <script src="http://svg.dabbles.info/animate-object-path.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        background-color: blue;
+        display: flex;
+        justify-content: center;
+      }
+
+      .svg-holder {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .highlight-track {
+        stroke: "red";
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="svg-holder">
+        <svg
+          id="svg-area"
+          height="100vh"
+          viewBox="0 0 800 600"
+          style="background-color: #ccc;"
+          preserveAspectRatio
+        ></svg>
+      </div>
+    </div>
+
+    <script>
+      let s = Snap("#svg-area");
+
+      createPerson = function(
+        x = 200,
+        y = 200,
+        radius = 25,
+        bWidth = 20,
+        bHeight = 100,
+        color = "blue"
+      ) {
+        let head = s.circle(x, y, radius);
+        let body = s.rect(x - bWidth / 2, y, bWidth, bHeight);
+        let person = s.group(head, body).attr("fill", color);
+        return person;
+      };
+
+      let l = {
+        startPoint: "M0 50",
+        line1: "L400 50",
+        turn1: "C525 50 525 200 400 200",
+        line2: "L150 200",
+        turn2: "C150 200, 100 200, 100 250",
+        line3: "L100 400",
+        turn3: "C100 400, 100 450, 150 450",
+        line4: "L400 450"
+      };
+
+      let r = {
+        start: "M0 100",
+        line1: "L400 100",
+        turn1: "C450 100, 450 150, 400 150",
+        line2: "L150 150",
+        turn2: "C150 150, 50 150, 50 250",
+        line3: "L50 400",
+        turn3: "C50 400, 50 500, 150 500",
+        line4: "L400 500"
+      };
+
+      let c = {
+        start: "M0 75",
+        line1: "L400 75",
+        turn1: "C490 75, 490 175, 400 175",
+        line2: "L150 175",
+        turn2: "C135 175, 65 175, 75 275",
+        line3: "L75 400",
+        turn3: "C75 400, 75 475, 150 475",
+        line4: "L400 475"
+      };
+
+      var leftTrackLine = s.path(
+        l.startPoint +
+          l.line1 +
+          l.turn1 +
+          l.line2 +
+          l.turn2 +
+          l.line3 +
+          l.turn3 +
+          l.line4
+      );
+
+      var rightTrackLine = s.path(
+        r.start +
+          r.line1 +
+          r.turn1 +
+          r.line2 +
+          r.turn2 +
+          r.line3 +
+          r.turn3 +
+          r.line4
+      );
+
+      var centerTrackLine = s
+        .path(
+          c.start +
+            c.line1 +
+            c.turn1 +
+            c.line2 +
+            c.turn2 +
+            c.line3 +
+            c.turn3 +
+            c.line4
+        )
+        .attr({ stroke: "red", strokeWidth: "0", fill: "transparent" });
+
+      let makeLeftChoice = function() {
+        let left = s.path("M400 450 L550 375 L800 375");
+        let right = s.path("M450 475, L550 425 L800 425");
+        let center = s
+          .path("M400 475, L550 400 L800 400")
+          .attr({ visibility: "hidden" });
+        return s
+          .group(center, left, right)
+          .attr({ stroke: "black", strokeWidth: 4, fill: "transparent" });
+      };
+
+      let makeRightChoice = function() {
+        let left = s.path("M450 475 L550 525 L800 525");
+        let right = s.path("M400 500, L550 575 L800 575");
+        let center = s.path("M400 475, L550 550 L800 550");
+        return s
+          .group(center, left, right)
+          .attr({ stroke: "black", strokeWidth: 4, fill: "transparent" });
+      };
+
+      let leftChoice = makeLeftChoice();
+      let rightChoice = makeRightChoice();
+      let longTrack = s
+        .g(rightTrackLine, leftTrackLine)
+        .attr({ stroke: "yellow", fill: "transparent", strokeWidth: 4 });
+
+      let trolley = s.rect(100, 100, 100, 100).attr("opacity", 0);
+      // Make a tram?
+      let g = s.g();
+      //let tram = g.image("Tram.svg", 0, 0, 100, 100).transform("r180");
+      //tram.transform("r180").drawAtPath(centerTrackLine, 7000, {});
+      trolley.attr({ opacity: 1 }).drawAtPath(centerTrackLine, 7000, {});
+
+      //
+      chosenLine = rightChoice[0];
+      setTimeout(function() {
+        trolley.attr({ opacity: 1 }).drawAtPath(chosenLine, 2000, {});
+      }, 7000);
+
+      function drawRectStart(el) {
+        el.drawAtPath(centerTrackLine, 7000, {
+          callback: function() {}
+        });
+      }
+
+      function drawRectChoice(el) {
+        el.drawAtPath(xhosenLine, 3000, {
+          callback: function() {}
+        });
+      }
+
+      // setTimeout(function() {
+      //   drawRectStart(trolley.attr({ opacity: 1 }));
+      //   drawRectChoice(trolley.attr({ opacity: 1 }));
+      // });
+
+      // Lever
+
+      let lever = {
+        base: s.circle(600, 200, 50).attr({ fill: "green" }),
+        baseCenter: s.circle(600, 200, 10).attr({ fill: "black" }),
+        arm: s.rect(595, 100, 10, 100),
+        handle: s.circle(600, 100, 15).attr({ fill: "red" }),
+        state: "top"
+      };
+
+      // Set lever in top position
+      let turnableLever = s.group(lever.arm, lever.handle);
+      turnableLever.transform("r60, 600, 200");
+
+      let turnLever = function() {
+        if (lever.state == "top") {
+          turnableLever.transform("r120, 600, 200");
+          lever.state = "bottom";
+        } else if (lever.state == "bottom") {
+          turnableLever.transform("r60, 600, 200");
+          lever.state = "top";
+        } else {
+          console.log("lever is in a weird state: " + lever.state);
+        }
+
+        chosenLine = leftChoice[1];
+      };
+      lever.base.click(turnLever);
+      turnableLever.click(turnLever);
+
+      let person = createPerson((x = 700), (y = 300));
+    </script>
+  </body>
+</html>
