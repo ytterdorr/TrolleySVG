@@ -162,16 +162,19 @@
         .attr({ stroke: "yellow", fill: "transparent", strokeWidth: 4 });
 
       let trolley = s.rect(100, 100, 100, 100).attr("opacity", 0);
-      // Make a tram?
-      let g = s.g();
-      //let tram = g.image("Tram.svg", 0, 0, 100, 100).transform("r180");
-      //tram.transform("r180").drawAtPath(centerTrackLine, 7000, {});
-      trolley.attr({ opacity: 1 }).drawAtPath(centerTrackLine, 7000, {});
+      // Animate Trolley
+      let canStillChoose = true;
+      trolley.attr({ opacity: 1 }).drawAtPath(centerTrackLine, 7000, {
+        callback: function() {
+          canStillChoose = false;
+          console.log("CanStillChoose:", canStillChoose);
+        }
+      });
 
-      //
-      chosenLine = rightChoice[0];
+      // Move on chosen line
+      let chosenLine = { title: "left", line: leftChoice[0] };
       setTimeout(function() {
-        trolley.attr({ opacity: 1 }).drawAtPath(chosenLine, 2000, {});
+        trolley.attr({ opacity: 1 }).drawAtPath(chosenLine.line, 2000, {});
       }, 7000);
 
       function drawRectStart(el) {
@@ -181,7 +184,7 @@
       }
 
       function drawRectChoice(el) {
-        el.drawAtPath(xhosenLine, 3000, {
+        el.drawAtPath(chosenLine, 3000, {
           callback: function() {}
         });
       }
@@ -216,7 +219,15 @@
           console.log("lever is in a weird state: " + lever.state);
         }
 
-        chosenLine = leftChoice[1];
+        if (canStillChoose) {
+          if (chosenLine.title == "left") {
+            chosenLine.title = "right";
+            chosenLine.line = rightChoice[0];
+          } else if (chosenLine.title == "right") {
+            chosenLine.title = "left";
+            chosenLine.line = leftChoice[0];
+          }
+        }
       };
       lever.base.click(turnLever);
       turnableLever.click(turnLever);
