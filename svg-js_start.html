@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.7.0/svg.min.js"></script>
+    <script src="svg.pathmorphing.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        background-color: blue;
+      }
+
+      .svg-holder {
+        width: 80vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container"><div id="drawing" class="svg-holder"></div></div>
+
+    <script>
+      let pathStrings = [
+        "m 0 80 H200 c80 0 80 80 80 80 v200 c0 80 80 80 80 80 h80 l180 -80 h300",
+        "m 0 80 H200 c80 0 80 80 80 80 v200 c0 80 80 80 80 80 h80 l180 80 h300"
+      ];
+
+      var canvas = SVG("drawing").size("100%", "100%"),
+        pathWidth = 8,
+        backgroundPath1 = canvas
+          .path("m 440 440 l180 -80 h300")
+          .fill("none")
+          .stroke({ width: pathWidth, color: "#000" }),
+        backgroundPath2 = canvas
+          .path("m 440 440 l180 80 h300")
+          .fill("none")
+          .stroke({ width: pathWidth, color: "#000" }),
+        path = canvas
+          .path("m 0 80 H200 c80 0 80 80 80 80 v200 c0 80 80 80 80 80 h80")
+          .fill("none")
+          .stroke({ width: pathWidth, color: "#f06" }),
+        selPath = canvas
+          .path("m 440 440 l180 -80 h300")
+          .fill("none")
+          .stroke({ width: pathWidth, color: "#f06" }),
+        rect = canvas.rect(100, 100),
+        length = path.length();
+
+      let pathCounter = 0;
+      function togglePath() {
+        pathCounter += 1;
+        path.plot(pathStrings[pathCounter % 2]);
+      }
+
+      //
+      let circleButton = canvas
+        .circle(100)
+        .fill("#f06")
+        .move(500, 600)
+        .click(togglePath);
+
+      rect
+        .animate(3000, "")
+        .during(function(pos, morph, eased) {
+          var p = path.pointAt(eased * length);
+          rect.center(p.x, p.y);
+        })
+        .loop(true, true);
+      rect.animate(1500, ">", 3000).during(function(pos, morph, eased) {
+        var p = selPath.pointAt(eased * selPath.length());
+      });
+    </script>
+  </body>
+</html>
